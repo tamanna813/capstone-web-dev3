@@ -1,0 +1,51 @@
+{
+  "info": {
+    "name": "Online Examination and Assessment System",
+    "description": "API tests for the Backend Development capstone project. Authenticate and set token/ID collection variables as you work through the workflow.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5000/api" },
+    { "key": "adminToken", "value": "" },
+    { "key": "facultyToken", "value": "" },
+    { "key": "studentToken", "value": "" },
+    { "key": "questionId", "value": "" },
+    { "key": "studentId", "value": "" },
+    { "key": "examId", "value": "" },
+    { "key": "attemptId", "value": "" }
+  ],
+  "item": [
+    { "name": "Health", "item": [
+      { "name": "Health Check", "request": { "method": "GET", "url": "{{baseUrl}}/health" } }
+    ]},
+    { "name": "Authentication", "item": [
+      { "name": "Register Student", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"name\": \"Test Student\",\n  \"email\": \"teststudent@example.com\",\n  \"password\": \"Student@123\"\n}" }, "url": "{{baseUrl}}/auth/register" } },
+      { "name": "Login Faculty", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"email\": \"faculty@example.com\",\n  \"password\": \"Faculty@12345\"\n}" }, "url": "{{baseUrl}}/auth/login" } },
+      { "name": "Login Student", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"email\": \"student@example.com\",\n  \"password\": \"Student@12345\"\n}" }, "url": "{{baseUrl}}/auth/login" } },
+      { "name": "Current User", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{facultyToken}}" }], "url": "{{baseUrl}}/auth/me" } },
+      { "name": "Refresh Token", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"refreshToken\": \"PASTE_REFRESH_TOKEN\"\n}" }, "url": "{{baseUrl}}/auth/refresh" } }
+    ]},
+    { "name": "Users (Admin)", "item": [
+      { "name": "List Users", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }], "url": "{{baseUrl}}/users?page=1&limit=10" } },
+      { "name": "Create Student", "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"name\": \"Another Student\",\n  \"email\": \"another@example.com\",\n  \"password\": \"Student@123\",\n  \"role\": \"student\"\n}" }, "url": "{{baseUrl}}/users" } }
+    ]},
+    { "name": "Question Bank (Faculty)", "item": [
+      { "name": "Create Question", "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{facultyToken}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"text\": \"Which language runs in a browser?\",\n  \"options\": [\"Python\", \"JavaScript\", \"C++\", \"Java\"],\n  \"correctOption\": 1,\n  \"subject\": \"Web Development\",\n  \"topic\": \"JavaScript\",\n  \"difficulty\": \"easy\",\n  \"marks\": 2\n}" }, "url": "{{baseUrl}}/questions" } },
+      { "name": "List Questions", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{facultyToken}}" }], "url": "{{baseUrl}}/questions?page=1&limit=10" } }
+    ]},
+    { "name": "Examinations", "item": [
+      { "name": "Create Exam (replace IDs and schedule)", "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{facultyToken}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"title\": \"Backend Fundamentals Test\",\n  \"instructions\": \"Select one correct option.\",\n  \"questions\": [\"{{questionId}}\"],\n  \"assignedStudents\": [\"{{studentId}}\"],\n  \"durationMinutes\": 30,\n  \"startTime\": \"2026-11-13T00:00:00.000Z\",\n  \"endTime\": \"2026-11-15T23:59:00.000Z\",\n  \"shuffleQuestions\": false\n}" }, "url": "{{baseUrl}}/exams" } },
+      { "name": "Publish Exam", "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{facultyToken}}" }], "url": "{{baseUrl}}/exams/{{examId}}/publish" } },
+      { "name": "List Exams as Student", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{studentToken}}" }], "url": "{{baseUrl}}/exams" } },
+      { "name": "Start Exam", "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{studentToken}}" }], "url": "{{baseUrl}}/exams/{{examId}}/start" } },
+      { "name": "Submit Attempt (replace attempt/question IDs)", "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{studentToken}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"answers\": [\n    { \"question\": \"{{questionId}}\", \"selectedOption\": 1 }\n  ]\n}" }, "url": "{{baseUrl}}/exams/attempts/{{attemptId}}/submit" } },
+      { "name": "Release Results", "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{facultyToken}}" }], "url": "{{baseUrl}}/exams/{{examId}}/release-results" } },
+      { "name": "My Results", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{studentToken}}" }], "url": "{{baseUrl}}/exams/results/me" } },
+      { "name": "Exam Analytics", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{facultyToken}}" }], "url": "{{baseUrl}}/exams/{{examId}}/analytics" } }
+    ]},
+    { "name": "Reports", "item": [
+      { "name": "Performance Summary", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{facultyToken}}" }], "url": "{{baseUrl}}/reports/performance" } },
+      { "name": "Score Distribution", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{facultyToken}}" }], "url": "{{baseUrl}}/reports/exam/{{examId}}/score-distribution" } }
+    ]}
+  ]
+}

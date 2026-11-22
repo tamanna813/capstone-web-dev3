@@ -1,0 +1,16 @@
+const router = require('express').Router();
+const c = require('../controllers/examController');
+const { protect, authorize } = require('../middleware/auth');
+router.use(protect);
+router.get('/', c.listExams);
+router.get('/results/me', authorize('student'), c.myResults);
+router.post('/', authorize('faculty', 'admin'), c.createExam);
+router.get('/:id', c.getExam);
+router.patch('/:id', authorize('faculty', 'admin'), c.updateExam);
+router.delete('/:id', authorize('faculty', 'admin'), c.deleteExam);
+router.post('/:id/publish', authorize('faculty', 'admin'), c.publishExam);
+router.post('/:id/start', authorize('student'), c.startAttempt);
+router.post('/attempts/:attemptId/submit', authorize('student'), c.submitAttempt);
+router.post('/:id/release-results', authorize('faculty', 'admin'), c.releaseResults);
+router.get('/:id/analytics', authorize('faculty', 'admin'), c.examAnalytics);
+module.exports = router;
